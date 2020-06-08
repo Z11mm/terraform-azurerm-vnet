@@ -48,7 +48,8 @@ variable "tags" {
 
 variable "subnet_service_endpoints" {
   description = "a list of service endpoints to add to the subnet. Each element of the list is a list of service endpoints to be applied to subnet of the same index"
-  default     = [[], ]
+  type        = list(list(string))
+  default     = null
 }
 
 
