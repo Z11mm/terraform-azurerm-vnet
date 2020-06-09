@@ -1,9 +1,10 @@
 #Azure Generic vNet Module
-data azurerm_resource_group "vnet" {
+data "azurerm_resource_group" "vnet" {
   name = var.resource_group_name
 }
 
-resource azurerm_virtual_network "vnet" {
+
+resource "azurerm_virtual_network" "vnet" {
   name                = var.vnet_name
   resource_group_name = data.azurerm_resource_group.vnet.name
   location            = data.azurerm_resource_group.vnet.location
@@ -13,14 +14,14 @@ resource azurerm_virtual_network "vnet" {
 }
 
 resource "azurerm_subnet" "subnet" {
-  count                                          = length(var.subnet_names)
-  name                                           = var.subnet_names[count.index]
+  count                                          = length(var.subnets)
+  name                                           = var.subnets[count.index]["name"]
   resource_group_name                            = data.azurerm_resource_group.vnet.name
   virtual_network_name                           = azurerm_virtual_network.vnet.name
-  address_prefixes                               = var.subnet_prefixes[count.index]
-  service_endpoints                              = var.subnet_service_endpoints == null ? null : var.subnet_service_endpoints[count.index]
-  enforce_private_link_endpoint_network_policies = var.subnet_enforce_private_link_endpoint
-  enforce_private_link_service_network_policies  = var.subnet_enforce_private_link_service
+  address_prefixes                               = lookup(var.subnets[count.index], "address_prefixes", ["10.0.1.0/24"])
+  service_endpoints                              = lookup(var.subnets[count.index], "service_endpoints", null)
+  enforce_private_link_endpoint_network_policies = lookup(var.subnets[count.index], "enforce_private_link_endpoint_network_policies", false)
+  enforce_private_link_service_network_policies  = lookup(var.subnets[count.index], "enforce_private_link_service_network_policies", false)
 }
 
 data "azurerm_subnet" "import" {
@@ -29,7 +30,7 @@ data "azurerm_subnet" "import" {
   resource_group_name  = data.azurerm_resource_group.vnet.name
   virtual_network_name = azurerm_virtual_network.vnet.name
 
-  depends_on = ["azurerm_subnet.subnet"]
+  depends_on = [azurerm_subnet.subnet]
 }
 
 resource "azurerm_subnet_network_security_group_association" "vnet" {
@@ -37,5 +38,5 @@ resource "azurerm_subnet_network_security_group_association" "vnet" {
   subnet_id                 = data.azurerm_subnet.import[each.key].id
   network_security_group_id = each.value
 
-  depends_on = ["data.azurerm_subnet.import"]
+  depends_on = [data.azurerm_subnet.import]
 }

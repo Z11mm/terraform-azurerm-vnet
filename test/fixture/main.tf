@@ -18,12 +18,25 @@ resource "azurerm_network_security_group" "nsg1" {
 }
 
 module "vnet" {
-  source                   = "../../"
-  resource_group_name      = azurerm_resource_group.test.name
-  address_space            = ["10.0.0.0/16"]
-  subnet_prefixes          = [["10.0.1.0/24"], ["10.0.2.0/24"], ["10.0.3.0/24"]]
-  subnet_names             = ["subnet1", "subnet2", "subnet3"]
-  subnet_service_endpoints = [["Microsoft.Sql"], null, null]
+  source              = "../../"
+  resource_group_name = azurerm_resource_group.test.name
+  address_space       = ["10.0.0.0/16"]
+  subnets = [
+    {
+      "name"              = "subnet1",
+      "address_prefixes"  = ["10.0.1.0/24"],
+      "service_endpoints" = ["Microsoft.Sql"]
+    },
+    {
+      "name"                                           = "subnet2",
+      "address_prefixes"                               = ["10.0.2.0/24"]
+      "enforce_private_link_endpoint_network_policies" = true
+    },
+    {
+      "name"             = "subnet3",
+      "address_prefixes" = ["10.0.3.0/24"]
+    },
+  ]
 
   nsg_ids = {
     subnet1 = azurerm_network_security_group.nsg1.id

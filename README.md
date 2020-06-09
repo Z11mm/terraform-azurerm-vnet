@@ -24,8 +24,20 @@ module "vnet" {
   source              = "Azure/vnet/azurerm"
   resource_group_name = azurerm_resource_group.example.name
   address_space       = ["10.0.0.0/16"]
-  subnet_prefixes     = [["10.0.1.0/24"], ["10.0.2.0/24"], ["10.0.3.0/24"]]
-  subnet_names        = ["subnet1", "subnet2", "subnet3"]
+  subnets = [
+    { 
+      "name"             = "subnet1",
+      "address_prefixes" = ["10.0.1.0/24"]
+    },
+    { 
+      "name"             = "subnet2",
+      "address_prefixes" = ["10.0.2.0/24"]
+    },
+    { 
+      "name"             = "subnet3",
+      "address_prefixes" = ["10.0.3.0/24"]
+    },
+  ]
 
   tags = {
     environment = "dev"
@@ -51,8 +63,23 @@ module "vnet" {
   source              = "Azure/vnet/azurerm"
   resource_group_name = azurerm_resource_group.example.name
   address_space       = ["10.0.0.0/16"]
-  subnet_prefixes     = [["10.0.1.0/24"], ["10.0.2.0/24"], ["10.0.3.0/24"]]
-  subnet_names        = ["subnet1", "subnet2", "subnet3"]
+
+  subnets = [
+    { 
+      "name"              = "subnet1",
+      "address_prefixes"  = ["10.0.1.0/24"],
+      "service_endpoints" = ["Microsoft.Sql"]
+    },
+    { 
+      "name"                                           = "subnet2",
+      "address_prefixes"                               = ["10.0.2.0/24"]
+      "enforce_private_link_endpoint_network_policies" = true
+    },
+    { 
+      "name"             = "subnet3",
+      "address_prefixes" = ["10.0.3.0/24"]
+    },
+  ]
 
   nsg_ids = {
     subnet1 = azurerm_network_security_group.ssh.id
@@ -158,9 +185,33 @@ This runs the full tests:
 $ docker run --rm azure-vnet /bin/bash -c "bundle install && rake full"
 ```
 
-## Authors
+## Providers
 
-Originally created by [Eugene Chuvyrov](http://github.com/echuvyrov)
+| Name | Version |
+|------|---------|
+| azurerm | n/a |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| address\_space | The address space that is used by the virtual network. | `list(string)` | <pre>[<br>  "10.0.0.0/16"<br>]</pre> | no |
+| dns\_servers | The DNS servers to be used with vNet. | `list` | `[]` | no |
+| nsg\_ids | A map of subnet name to Network Security Group IDs | `map(string)` | `{}` | no |
+| resource\_group\_name | Name of the resource group to be imported. | `any` | n/a | yes |
+| subnets | List of maps containing Subnets and their inputs to be created. | `list` | <pre>[<br>  {<br>    "address_prefixes": [<br>      "10.0.1.0/24"<br>    ],<br>    "enforce_private_link_endpoint_network_policies": false,<br>    "enforce_private_link_service_network_policies": false,<br>    "name": "subnet1",<br>    "service_endpoints": null<br>  }<br>]</pre> | no |
+| tags | The tags to associate with your network and subnets. | `map(string)` | <pre>{<br>  "ENV": "test"<br>}</pre> | no |
+| vnet\_name | Name of the vnet to create | `string` | `"acctvnet"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| vnet\_address\_space | The address space of the newly created vNet |
+| vnet\_id | The id of the newly created vNet |
+| vnet\_location | The location of the newly created vNet |
+| vnet\_name | The Name of the newly created vNet |
+| vnet\_subnets | The ids of subnets created inside the newl vNet |
 
 ## License
 

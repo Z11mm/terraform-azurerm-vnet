@@ -19,16 +19,6 @@ variable "dns_servers" {
   default     = []
 }
 
-variable "subnet_prefixes" {
-  description = "The address prefix to use for the subnet."
-  default     = [["10.0.1.0/24"]]
-}
-
-variable "subnet_names" {
-  description = "A list of public subnets inside the vNet."
-  default     = ["subnet1", "subnet2", "subnet3"]
-}
-
 variable "nsg_ids" {
   description = "A map of subnet name to Network Security Group IDs"
   type        = map(string)
@@ -46,19 +36,13 @@ variable "tags" {
   }
 }
 
-variable "subnet_service_endpoints" {
-  description = "a list of service endpoints to add to the subnet. Each element of the list is a list of service endpoints to be applied to subnet of the same index"
-  type        = list(list(string))
-  default     = null
-}
-
-
-variable "subnet_enforce_private_link_endpoint" {
-  description = "Enable or Disable network policies for the private link endpoint on the created subnets. Default value is false. Conflicts with enforce_private_link_service_network_policies."
-  default     = false
-}
-
-variable "subnet_enforce_private_link_service" {
-  description = "Enable or Disable network policies for the private link service on the created subnets. Default valule is false. Conflicts with enforce_private_link_endpoint_network_policies"
-  default     = false
+variable "subnets" {
+  description = "List of maps containing Subnets and their inputs to be created."
+  default = [{
+    "name"                                           = "subnet1"
+    "address_prefixes"                               = ["10.0.1.0/24"]
+    "enforce_private_link_endpoint_network_policies" = false
+    "enforce_private_link_service_network_policies"  = false
+    "service_endpoints"                              = null
+  }]
 }
