@@ -213,6 +213,12 @@ $ docker run --rm azure-vnet /bin/bash -c "bundle install && rake full"
 | vnet\_name | The Name of the newly created vNet |
 | vnet\_subnets | The ids of subnets created inside the newl vNet |
 
+## Contributing
+
+Report issues/questions/feature requests on in the issues section.
+
+Full contributing guidelines are covered [here](CONTRIBUTING.md).
+
 ## License
 
 [MIT](LICENSE)
