@@ -1,6 +1,3 @@
-# Variable files
-terraform.tfvars
-
 # Compiled files
 *.tfstate
 *.tfstate.backup
@@ -35,3 +32,26 @@ tags
 
 # Ruby download package lock file.
 Gemfile.lock
+
+**/inspec.lock
+*.gem
+eks-admin-cluster-role-binding.yaml
+eks-admin-service-account.yaml
+.idea/
+*.iml
+config-map-aws-auth*.yaml
+kubeconfig_*
+*.swp
+
+# Local .terraform directories
+**/.terraform/*
+
+# Terraform lockfile
+.terraform.lock.hcl
+
+#  Crash log files
+crash.log
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
